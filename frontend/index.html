@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PhishGuard AI — Phishing & Scam URL Detector</title>
+  <meta name="description" content="AI-powered phishing and scam website detection system. Paste any URL and get an instant ML-based safety verdict with confidence score." />
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ══════════════════════ BACKGROUND PARTICLES ══════════════════════ -->
+<div class="particles" aria-hidden="true" id="particles"></div>
+
+<!-- ══════════════════════ APP SHELL ══════════════════════ -->
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5"/>
+            <path d="M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div>
+          <span class="brand-name">PhishGuard <span class="brand-accent">AI</span></span>
+          <span class="brand-tagline">ML-Powered URL Safety Analysis</span>
+        </div>
+      </div>
+      <nav class="header-nav">
+        <button class="nav-btn active" data-tab="scanner" id="tab-scanner">Scanner</button>
+        <button class="nav-btn" data-tab="history" id="tab-history">History</button>
+        <button class="nav-btn" data-tab="analytics" id="tab-analytics">Analytics</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ─── TAB: SCANNER ─── -->
+    <section class="tab-panel active" id="panel-scanner">
+
+      <div class="hero">
+        <div class="hero-badge">
+          <span class="pulse-dot"></span>
+          Real-time AI Detection
+        </div>
+        <h1 class="hero-title">
+          Detect Phishing &amp; Scam<br />
+          <span class="gradient-text">URLs Instantly</span>
+        </h1>
+        <p class="hero-sub">
+          Powered by Random Forest ML — 16 extracted features analysed in milliseconds.
+        </p>
+      </div>
+
+      <!-- URL Input Card -->
+      <div class="card scanner-card">
+        <div class="input-group" id="input-group">
+          <div class="input-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="M21 21l-4.35-4.35"/>
+            </svg>
+          </div>
+          <input
+            type="url"
+            id="url-input"
+            class="url-input"
+            placeholder="https://example.com or paste any suspicious link…"
+            autocomplete="off"
+            spellcheck="false"
+            maxlength="2048"
+          />
+          <button class="scan-btn" id="scan-btn">
+            <span class="scan-btn-text">Scan URL</span>
+            <div class="scan-btn-spinner" aria-hidden="true"></div>
+          </button>
+        </div>
+        <p class="input-hint">Supports HTTP &amp; HTTPS · No data is shared externally</p>
+
+        <!-- Error message -->
+        <div class="error-banner hidden" id="error-banner" role="alert">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="error-text">Something went wrong.</span>
+        </div>
+      </div>
+
+      <!-- Result Card (hidden until a scan completes) -->
+      <div class="card result-card hidden" id="result-card">
+        <div class="result-header">
+          <div class="result-icon-wrap" id="result-icon-wrap">
+            <!-- injected by JS -->
+          </div>
+          <div class="result-meta">
+            <span class="result-label" id="result-label">—</span>
+            <span class="result-url" id="result-url">—</span>
+          </div>
+        </div>
+
+        <div class="confidence-row">
+          <span class="conf-label">Model Confidence</span>
+          <span class="conf-value" id="conf-value">—</span>
+        </div>
+        <div class="confidence-bar-track">
+          <div class="confidence-bar-fill" id="conf-bar"></div>
+        </div>
+
+        <!-- Feature grid -->
+        <details class="feature-details">
+          <summary>View extracted features</summary>
+          <div class="feature-grid" id="feature-grid"></div>
+        </details>
+      </div>
+
+      <!-- Loading skeleton -->
+      <div class="card skeleton-card hidden" id="skeleton-card" aria-busy="true" aria-label="Analysing URL">
+        <div class="skeleton-header">
+          <div class="skeleton-circle skeleton-pulse"></div>
+          <div class="skeleton-lines">
+            <div class="skeleton-line w70 skeleton-pulse"></div>
+            <div class="skeleton-line w50 skeleton-pulse"></div>
+          </div>
+        </div>
+        <div class="skeleton-line w100 skeleton-pulse" style="height:8px;border-radius:4px;margin-top:1.5rem;"></div>
+        <p class="skeleton-msg">🔍 Extracting features &amp; running ML model…</p>
+      </div>
+
+    </section>
+
+    <!-- ─── TAB: HISTORY ─── -->
+    <section class="tab-panel" id="panel-history">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Scan History</h2>
+          <p class="panel-sub">All previous URL analyses, newest first.</p>
+        </div>
+        <div class="panel-actions">
+          <button class="btn-outline" id="refresh-history-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Refresh
+          </button>
+          <button class="btn-danger" id="clear-history-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+            Clear All
+          </button>
+        </div>
+      </div>
+
+      <div class="card" id="history-container">
+        <div class="loading-state" id="history-loading">
+          <div class="spinner-lg"></div>
+          <p>Loading history…</p>
+        </div>
+        <div class="empty-state hidden" id="history-empty">
+          <div class="empty-icon">📋</div>
+          <h3>No scans yet</h3>
+          <p>Run your first URL scan to see results here.</p>
+          <button class="btn-primary" onclick="switchTab('scanner')">Scan a URL</button>
+        </div>
+        <div class="hidden" id="history-table-wrap">
+          <table class="history-table" id="history-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>URL</th>
+                <th>Result</th>
+                <th>Confidence</th>
+                <th>Date &amp; Time</th>
+              </tr>
+            </thead>
+            <tbody id="history-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── TAB: ANALYTICS ─── -->
+    <section class="tab-panel" id="panel-analytics">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Analytics Dashboard</h2>
+          <p class="panel-sub">Aggregate statistics from all scanned URLs.</p>
+        </div>
+        <button class="btn-outline" id="refresh-analytics-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          Refresh
+        </button>
+      </div>
+
+      <div class="analytics-grid" id="analytics-grid">
+        <!-- Stats cards -->
+        <div class="stat-card" id="stat-total">
+          <div class="stat-icon stat-icon-blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value" id="stat-total-val">—</span>
+            <span class="stat-label">Total Scans</span>
+          </div>
+        </div>
+        <div class="stat-card" id="stat-safe">
+          <div class="stat-icon stat-icon-green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value" id="stat-safe-val">—</span>
+            <span class="stat-label">Safe URLs</span>
+          </div>
+        </div>
+        <div class="stat-card" id="stat-phishing">
+          <div class="stat-icon stat-icon-red">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value" id="stat-phishing-val">—</span>
+            <span class="stat-label">Phishing URLs</span>
+          </div>
+        </div>
+        <div class="stat-card" id="stat-rate">
+          <div class="stat-icon stat-icon-orange">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value" id="stat-rate-val">—</span>
+            <span class="stat-label">Phishing Rate</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Donut Chart -->
+      <div class="card chart-card">
+        <h3 class="chart-title">Safe vs Phishing Distribution</h3>
+        <div class="chart-container">
+          <svg class="donut-chart" id="donut-chart" viewBox="0 0 200 200">
+            <circle class="donut-ring" cx="100" cy="100" r="70" fill="none" stroke="#1e293b" stroke-width="28"/>
+            <circle class="donut-segment donut-safe" id="donut-safe-arc"
+                    cx="100" cy="100" r="70" fill="none"
+                    stroke="hsl(142,70%,45%)" stroke-width="28"
+                    stroke-dasharray="0 440" stroke-linecap="round"
+                    transform="rotate(-90 100 100)"/>
+            <circle class="donut-segment donut-phishing" id="donut-phishing-arc"
+                    cx="100" cy="100" r="70" fill="none"
+                    stroke="hsl(0,75%,60%)" stroke-width="28"
+                    stroke-dasharray="0 440" stroke-linecap="round"
+                    transform="rotate(-90 100 100)"/>
+            <text x="100" y="95" class="donut-center-label" id="donut-pct">—%</text>
+            <text x="100" y="115" class="donut-center-sub">phishing</text>
+          </svg>
+          <div class="chart-legend">
+            <div class="legend-item">
+              <span class="legend-dot" style="background:hsl(142,70%,45%)"></span>
+              <span>Safe</span>
+              <span class="legend-count" id="legend-safe-n">0</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot" style="background:hsl(0,75%,60%)"></span>
+              <span>Phishing</span>
+              <span class="legend-count" id="legend-phishing-n">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bar chart -->
+        <div class="bar-section">
+          <h4 class="bar-section-title">Average Confidence by Label</h4>
+          <div class="bar-row">
+            <span class="bar-label">Safe</span>
+            <div class="bar-track">
+              <div class="bar-fill bar-fill-safe" id="bar-safe" style="width:0%"></div>
+            </div>
+            <span class="bar-pct" id="bar-safe-pct">0%</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-label">Phishing</span>
+            <div class="bar-track">
+              <div class="bar-fill bar-fill-phishing" id="bar-phishing" style="width:0%"></div>
+            </div>
+            <span class="bar-pct" id="bar-phishing-pct">0%</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>PhishGuard AI &copy; 2025 — Built with Flask · scikit-learn · Random Forest · SQLite/MongoDB</p>
+    <p class="footer-disclaimer">For educational and research purposes only. Always verify URLs through multiple sources.</p>
+  </footer>
+
+</div><!-- .app -->
+
+<script src="app.js"></script>
+</body>
+</html>
