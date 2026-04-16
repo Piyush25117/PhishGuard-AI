@@ -1,8 +1,8 @@
 <div align="center">
 
-# 🛡️ PhishGuard AI
+# 🛡️ PhishGuard AI — ML-Based Phishing & Scam URL Detector
 
-### AI-Powered Phishing & Scam URL Detection System
+Machine Learning-based system for detecting phishing and scam URLs in real-time.
 
 [![Python](https://img.shields.io/badge/Python-3.11+-blue?logo=python)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.0-green?logo=flask)](https://flask.palletsprojects.com/)
@@ -30,7 +30,7 @@ Results are stored in **MongoDB** (with an automatic **SQLite fallback**) so you
 
 | Category | Details |
 |---|---|
-| **ML Model** | Random Forest (200 trees) trained on 6 000+ synthetic samples |
+| **ML Model** | Random Forest (200 trees)trained on synthetic dataset (for demonstration purposes) |
 | **Feature Extraction** | 16 URL features: length, IP address, `@`, `//`, hyphens, dots, HTTPS, domain age, SSL cert, TLD risk, special chars, port, subdomains, path length, page-rank mock |
 | **Prediction API** | `POST /api/predict` — returns label + confidence |
 | **History API** | `GET /api/history` / `DELETE /api/history` |
@@ -38,6 +38,12 @@ Results are stored in **MongoDB** (with an automatic **SQLite fallback**) so you
 | **Frontend** | Single-page dark UI with scanner, history table, donut chart |
 | **Database** | MongoDB primary, auto-falls back to SQLite |
 | **Docker** | Multi-stage build + `docker-compose` with Nginx reverse proxy |
+
+---
+
+## ⚙️ Special Handling
+
+> ⚠️ Note: To reduce false positives during demonstration, some well-known domains (e.g., Google, Amazon, GitHub) are automatically classified as Safe.
 
 ---
 
@@ -256,6 +262,14 @@ Health-check: `{ "status": "ok" }`
 - [ ] **Ensemble model** — combine RF with XGBoost / LSTM
 - [ ] **Webhook alerts** — Slack / email when phishing detected
 - [ ] **Rate limiting** — prevent API abuse
+
+---
+
+## ⚠️ Limitations
+- Uses synthetic dataset (not trained on real-world phishing datasets)
+- WHOIS and SSL features may fail due to network/API restrictions
+- Some complex or long URLs may produce false positives
+- Detection is based on handcrafted features, not deep learning
 
 ---
 
