@@ -29,9 +29,9 @@ def create_app() -> Flask:
     CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     # ── Register blueprints (FIXED IMPORTS) ────────────────────────────────
-    from .routes.predict import predict_bp
-    from .routes.history import history_bp
-    from .routes.analytics import analytics_bp
+    from routes.predict import predict_bp
+    from routes.history import history_bp
+    from routes.analytics import analytics_bp
 
     app.register_blueprint(predict_bp, url_prefix="/api")
     app.register_blueprint(history_bp, url_prefix="/api")
